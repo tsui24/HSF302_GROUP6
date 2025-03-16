@@ -3,7 +3,7 @@ package com.se1889_jv.swp391.swpstart.config;
 //import com.se1889_jv.swp391.swpstart.service.CustomUserDetailsService;
 
 import com.se1889_jv.swp391.swpstart.service.CustomUserDetailsService;
-import com.se1889_jv.swp391.swpstart.service.implementservice.UserService;
+import com.se1889_jv.swp391.swpstart.service.UserService;
 import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.session.security.web.authentication.SpringSessionRememberMeServices;
 
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
@@ -43,19 +42,24 @@ public class SecurityConfiguration {
 
         return authProvider;
     }
-
-    @Bean
-    public SpringSessionRememberMeServices rememberMeServices() {
-        SpringSessionRememberMeServices rememberMeServices = new SpringSessionRememberMeServices();
-        // optionally customize
-        rememberMeServices.setAlwaysRemember(true);
-        return rememberMeServices;
-    }
+    // cai nay dang loi
+//    @Bean
+//    public SpringSessionRememberMeServices rememberMeServices() {
+//        SpringSessionRememberMeServices rememberMeServices = new SpringSessionRememberMeServices();
+//        // optionally customize
+//        rememberMeServices.setAlwaysRemember(true);
+//        return rememberMeServices;
+//    }
 
     @Bean
     public AuthenticationSuccessHandler customSuccessHandler(UserService userService) {
         return new CustomSuccessHandler(userService);
     }
+
+
+
+
+
 //
 //
 //    //Don't touch please
@@ -121,7 +125,7 @@ SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                         .maximumSessions(1)
                         .maxSessionsPreventsLogin(false))
             .logout(logout -> logout.deleteCookies("JSESSIONID").invalidateHttpSession(true))
-            .rememberMe(r -> r.rememberMeServices(rememberMeServices()))
+//            .rememberMe(r -> r.rememberMeServices(rememberMeServices()))
             .formLogin(formLogin -> formLogin
                     .loginPage("/login")
                     .failureUrl("/login?error")
