@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div id="layoutSidenav_nav" th:fragment="sidebar">
+    <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+        <div class="sb-sidenav-menu">
+            <div class="nav">
+                <div class="sb-sidenav-menu-heading">Features</div>
+                <a class="nav-link" th:href="@{/templates/admin}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    Dashboard
+                </a>
+                <a class="nav-link" th:href="@{/admin/user}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
+                    User
+                </a>
+                <a class="nav-link" th:href="@{/admin/product}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-box"></i></div>
+                    Product
+                </a>
+                <a class="nav-link" th:href="@{/templates/admin/order}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
+                    Order
+                </a>
+            </div>
+        </div>
+    </nav>
+</div>
+</body>
+</html>
