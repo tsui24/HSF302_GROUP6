@@ -12,21 +12,10 @@
 </head>
 
 <body class="sb-nav-fixed">
-<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-    <a class="navbar-brand ps-3" href="index.html">Shop</a>
-</nav>
+
+<th:block th:insert="~{admin/layout/header :: header}"></th:block>
 <div id="layoutSidenav">
-    <div id="layoutSidenav_nav">
-        <nav class="sb-sidenav accordion sb-sidenav-dark">
-            <div class="sb-sidenav-menu">
-                <div class="nav">
-                    <a class="nav-link" href="#">Dashboard</a>
-                    <a class="nav-link" href="#">Orders</a>
-                    <a class="nav-link" href="#">Products</a>
-                </div>
-            </div>
-        </nav>
-    </div>
+    <th:block th:insert="~{admin/layout/sidebar :: sidebar}"></th:block>
     <div id="layoutSidenav_content">
         <main>
             <div class="container-fluid px-4">

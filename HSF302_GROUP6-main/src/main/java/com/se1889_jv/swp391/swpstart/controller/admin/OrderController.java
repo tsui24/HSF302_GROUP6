@@ -4,6 +4,7 @@ package com.se1889_jv.swp391.swpstart.controller.admin;
 import com.se1889_jv.swp391.swpstart.domain.Order;
 import com.se1889_jv.swp391.swpstart.domain.OrderDetail;
 import com.se1889_jv.swp391.swpstart.domain.Product;
+import com.se1889_jv.swp391.swpstart.repository.StatusRepository;
 import com.se1889_jv.swp391.swpstart.service.OrderDetailService;
 import com.se1889_jv.swp391.swpstart.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -12,14 +13,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -28,6 +25,7 @@ public class OrderController {
 
     private final OrderService orderService;
     private final OrderDetailService orderDetailService;
+    private final StatusRepository statusRepository;
 
     @GetMapping("/admin/order")
     public String listOrder(Model model,
@@ -65,36 +63,36 @@ public class OrderController {
         return "admin/order/detail";
     }
 
-    @GetMapping("/admin/revenue")
-    public String showRevenueDashboard(Model model,
-                                       @RequestParam(value = "fromDate", required = false) String fromDateStr,
-                                       @RequestParam(value = "toDate", required = false) String toDateStr,
-                                       @RequestParam(value = "filterType", required = false, defaultValue = "day") String filterType) {
+    @GetMapping("/admin/order/update/{id}")
+    public String getUpdateOrderPage(Model model, @PathVariable long id) {
+        Optional<Order> currentOrder = this.orderService.fetchOrderById(id);
+        model.addAttribute("newOrder", currentOrder.get());
+        model.addAttribute("statusList", statusRepository.findAll());
 
-        // Chuyển đổi từ chuỗi sang LocalDate
-        LocalDate fromDate = (fromDateStr != null) ? LocalDate.parse(fromDateStr) : LocalDate.now().minusMonths(1);
-        LocalDate toDate = (toDateStr != null) ? LocalDate.parse(toDateStr) : LocalDate.now();
-
-        double totalRevenue = orderService.getTotalRevenue();
-        long totalOrders = orderService.getTotalOrders();
-        Product bestSellingProduct = orderService.getBestSellingProduct();
-        System.out.println(bestSellingProduct);
-        System.out.println(totalRevenue);
-        System.out.println(totalOrders);
-        List<Object[]> chartDataList = orderService.getRevenue(fromDateStr, toDateStr, filterType);
-
-        model.addAttribute("chartData", chartDataList);
-
-
-        model.addAttribute("totalRevenue", totalRevenue);
-        model.addAttribute("totalOrders", totalOrders);
-        model.addAttribute("bestSellingProduct", bestSellingProduct);
-        model.addAttribute("fromDate", fromDate);
-        model.addAttribute("toDate", toDate);
-        model.addAttribute("filterType", filterType);
-
-        return "admin/order/revenue";
+        return "admin/order/update";
     }
+
+    @PostMapping("/admin/order/update")
+    public String handleUpdateOrder(@ModelAttribute("newOrder") Order order) {
+        this.orderService.updateOrder(order);
+        return "redirect:/admin/order";
+    }
+
+    @GetMapping("/admin/order/delete/{id}")
+    public String getDeleteOrderPage(Model model, @PathVariable long id) {
+        model.addAttribute("id", id);
+        model.addAttribute("newOrder", new Order());
+        return "admin/order/delete";
+    }
+
+    @PostMapping("/admin/order/delete")
+    public String postDeleteOrder(@RequestParam("id") Long id) {
+        System.out.println(id);
+        this.orderService.deleteOrderById(id);
+        return "redirect:/admin/order";
+    }
+
+
 
 
 }
