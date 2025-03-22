@@ -103,35 +103,18 @@ public class SecurityConfiguration {
 //Don't touch please
 @Bean
 SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    UserService userService1 = null;
     http
             .authorizeHttpRequests(authorize -> authorize
-                    .dispatcherTypeMatchers(DispatcherType.FORWARD,
-                            DispatcherType.INCLUDE).permitAll()
-
-                    .requestMatchers("/", "/login", "/register", "/client/**", "/admin/**", "/api/**").permitAll()
-                            .requestMatchers("/customer", "/customer/**").hasAnyRole("STAFF", "OWNER")
-                            .requestMatchers("/warehouse", "/warehouse/**", "/product", "/product/**","/payment", "/payment/history").hasRole("OWNER")
-
-                            .requestMatchers("/profile/**").hasAnyRole("ADMIN", "STAFF", "OWNER")
-//                    .requestMatchers("/customer/**", "/product/**").hasRole("OWNER")
-                            .requestMatchers("/service/**").hasRole("ADMIN")
-                            .anyRequest().authenticated()
+                    .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE).permitAll()
+                    .requestMatchers("/**").permitAll()  // Bỏ qua xác thực cho tất cả đường dẫn
+                    .anyRequest().permitAll()
             )
-
-            .sessionManagement((sessionManagement) -> sessionManagement
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                        .invalidSessionUrl("/logout?expired")
-                        .maximumSessions(1)
-                        .maxSessionsPreventsLogin(false))
+            .csrf(csrf -> csrf.disable())  // Tắt CSRF để dễ phát triển
+            .sessionManagement(sessionManagement -> sessionManagement
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Không sử dụng session
             .logout(logout -> logout.deleteCookies("JSESSIONID").invalidateHttpSession(true))
-//            .rememberMe(r -> r.rememberMeServices(rememberMeServices()))
-            .formLogin(formLogin -> formLogin
-                    .loginPage("/login")
-                    .failureUrl("/login?error")
-                    .successHandler(customSuccessHandler(userService1))
-                    .permitAll())
-            .exceptionHandling(ex -> ex.accessDeniedPage("/access-deny"));
+            .formLogin(formLogin -> formLogin.disable());  // Tắt trang login
+
     return http.build();
 }
 

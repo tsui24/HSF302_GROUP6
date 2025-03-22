@@ -1,0 +1,19 @@
+<footer class="py-4 bg-light mt-auto" th:fragment="footer">
+    <div class="container-fluid px-4">
+        <div class="d-flex align-items-center justify-content-between small">
+            <div class="text-muted">Copyright &copy; Quyen</div>
+            <div>
+                <a href="https://www.facebook.com/profile.php?id=100039947165018" target="_blank">Facebook</a>
+            </div>
+        </div>
+    </div>
+    <div th:if="${session.message}">
+        <div id="alertMessage" class="alert alert-success text-center" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; width: 50%;" role="alert" th:text="${session.message}"></div>
+        <script>
+            setTimeout(function () {
+                document.getElementById("alertMessage").style.display = 'none';
+            }, 2000);
+        </script>
+        <th:block th:text="${#session.removeAttribute('message')}"></th:block>
+    </div>
+</footer>

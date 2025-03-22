@@ -16,10 +16,14 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(columnDefinition = "NVARCHAR(255)")
     private String name;
     private double price;
+    @Column(columnDefinition = "NVARCHAR(255)")
     private String shortDescription;
+    @Column(columnDefinition = "NVARCHAR(MAX)")
     private String detailDescription;
+    @Column(columnDefinition = "NVARCHAR(255)")
     private String target;
     private boolean storage;
     private String image;

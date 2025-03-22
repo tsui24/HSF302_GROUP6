@@ -75,7 +75,6 @@
             <scope>2.5.6</scope>
         </dependency>
 
-
     </dependencies>
 
     <build>

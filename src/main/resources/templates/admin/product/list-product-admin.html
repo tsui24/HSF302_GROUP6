@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="author" content="Duong Quyen" />
+    <title>Dashboard - List Of Product</title>
+    <link href="/css/styles.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script type="text/javascript" th:inline="javascript">
+        function showMessage(messageType, message) {
+            if (message && messageType) {
+                alert(message);
+                // Điều hướng về trang listCustomer sau 3 giây
+                setTimeout(function () {
+                    window.location.href = "/product/list-product-admin";
+                });
+                // Hiển thị thông báo bằng alert
+            }
+        }
+    </script>
+    <script>
+        function filterProducts() {
+            let params = new URLSearchParams();
+            document.querySelectorAll('.filter-input').forEach(input => {
+                if (input.value.trim() !== '') { // Chỉ thêm tham số nếu có giá trị
+                    params.append(input.name, input.value);
+                }
+            });
+
+            window.location.href = '/product/list-product-admin' + '?' + params.toString();
+        }
+        document.addEventListener("DOMContentLoaded", function() {
+            let params = new URLSearchParams(window.location.search);
+            document.querySelectorAll('.filter-input').forEach(input => {
+                if (params.has(input.name)) {
+                    let value = params.get(input.name);
+                    if (input.type === "date") {
+                        input.value = value.substring(0, 10); // Định dạng YYYY-MM-DD
+                    } else {
+                        input.value = value;
+                    }
+                }
+            });
+        });
+
+    </script>
+</head>
+
+<body class="sb-nav-fixed">
+<header th:replace="~{admin/layout/header :: header}"></header>
+<div id="layoutSidenav">
+    <aside th:replace="~{admin/layout/sideBar :: sidebar}"></aside>
+    <div id="messageBox">
+        <script type="text/javascript">
+            // Gọi hàm showMessage với messageType và message từ flash attributes
+            /* Thymeleaf sẽ thay thế các giá trị này */
+            let messageType = '[[${messageType}]]';
+            let message = '[[${message}]]';
+
+            if (message && message.trim() !== '') {
+                showMessage(messageType, message);
+            }
+        </script>
+    </div>
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">Manage Products</h1>
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item"><a href="/product/list-product-admin">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Products</li>
+                </ol>
+                <div class="mt-5">
+                    <div class="row">
+                        <div class="col-12 mx-auto">
+                            <div class="d-flex justify-content-between">
+                                <h3>List of products</h3>
+                                <a href="/product/add-product" class="btn btn-primary">Create a product</a>
+                            </div>
+                            <div th:if="${errorMessage}" style="color: red; font-weight: bold;">
+                                <p th:text="${errorMessage}"></p>
+                            </div>
+                            <hr />
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Price</th>
+                                    <th>Storage</th>
+                                    <th>Category</th>
+                                    <th>Action</th>
+                                </tr>
+                                <tr>
+                                    <th class="twin-field">
+                                        <input type="text" class="filter-input" name="idFrom" onchange="filterProducts()" style="width: 30px;">
+                                        <input type="text" class="filter-input" name="idTo" onchange="filterProducts()" style="width: 30px;">
+                                    </th>
+                                    <th>
+                                        <input type="text" class="filter-input" name="name" onchange="filterProducts()" style="width: 180px;">
+                                    </th>
+                                    <th class="twin-field">
+                                        <input type="number" class="filter-input" name="priceFrom" onchange="filterProducts()" style="width: 100px;">
+                                        <input type="number" class="filter-input" name="priceTo" onchange="filterProducts()" style="width: 100px;">
+                                    </th>
+                                    <th>
+                                        <select class="filter-input" name="storageState" onchange="filterProducts()" style="width: 100px;">
+                                            <option value="">All</option>
+                                            <option value="True">In stock</option>
+                                            <option value="False">Out of stock</option>
+                                        </select>
+                                    </th>
+                                    <th>
+                                        <select class="filter-input" name="category" onchange="filterProducts()" style="width: 100px;">
+                                            <option value="">All</option>
+                                            <option value="1">Desserts</option>
+                                            <option value="2">Asian Dishes</option>
+                                            <option value="3">European Dishes</option>
+                                            <option value="4">Drinks</option>
+                                            <option value="5">Cakes</option>
+                                        </select>
+                                    </th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <th:block th:each="product : ${products}">
+                                    <tr>
+                                        <th th:text="${product.id}"></th>
+                                        <td th:text="${product.name}"></td>
+                                        <td>
+                                            <span th:text="${#numbers.formatDecimal(product.price, 0, 2, 'POINT')}"></span> đ
+                                        </td>
+                                        <td>
+                                            <span th:text="${product.storage ? 'In stock' : 'Out of stock'}"></span>
+                                        </td>
+
+                                        <td th:if="${product != null}">
+                                            <span th:each="category : ${categoryList}"
+                                                  th:text="${category.id == product.category.id? category.name : ''}"></span>
+                                        </td>
+                                        <td>
+                                            <a th:href="@{/product/detail/{id}(id=${product.id})}" class="btn btn-success">View</a>
+                                            <a th:href="@{/product/update/{id}(id=${product.id})}" class="btn btn-warning mx-2">Update</a>
+                                            <a th:href="@{/product/delete/{id}(id=${product.id})}" class="btn btn-danger">Delete</a>
+                                        </td>
+                                    </tr>
+                                </th:block>
+                                </tbody>
+                            </table>
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item">
+                                        <a th:classappend="${1 eq currentPage ? 'disabled page-link' : 'page-link'}"
+                                           th:href="@{/product/list-product-admin(page=${currentPage - 1}, idFrom=${idFrom}, idTo=${idTo},
+                                                                                   name=${name}, priceFrom=${priceFrom},priceTo=${priceTo},
+                                                                                   storageState=${storageState}, category=${category})}" aria-label="Previous">
+                                            <span aria-hidden="true"> << </span>
+                                        </a>
+                                    </li>
+                                    <th:block th:each="i : ${#numbers.sequence(0, (totalPages != null ? totalPages - 1 : 0))}">
+                                        <li class="page-item">
+                                            <a th:classappend="${(i + 1) eq currentPage ? 'active page-link' : 'page-link'}"
+                                               th:href="@{/product/list-product-admin(page=${i + 1}, idFrom=${idFrom}, idTo=${idTo},
+                                                                                   name=${name}, priceFrom=${priceFrom},priceTo=${priceTo},
+                                                                                   storageState=${storageState}, category=${category})}">
+                                                <span th:text="${i + 1}"></span>
+                                            </a>
+                                        </li>
+                                    </th:block>
+                                    <li class="page-item">
+                                        <a th:classappend="${totalPages eq currentPage ? 'disabled page-link' : 'page-link'}"
+                                           th:href="@{/product/list-product-admin(page=${currentPage + 1}, idFrom=${idFrom}, idTo=${idTo},
+                                                                                   name=${name}, priceFrom=${priceFrom},priceTo=${priceTo},
+                                                                                   storageState=${storageState}, category=${category})}" aria-label="Next">
+                                            <span aria-hidden="true"> >> </span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="~{admin/layout/footer :: footer}"></footer>
+    </div>
+</div>
+<div id="imageModal" class="modal">
+    <span class="close" onclick="closeImageModal()"> X </span>
+    <img class="modal-content" id="modalImg">
+</div>
+
+<script>
+    function openImageModal(src) {
+        let modal = document.getElementById("imageModal");
+        let modalImg = document.getElementById("modalImg");
+
+        modal.style.display = "flex"; // Hiển thị modal
+        modalImg.src = src;
+        modalImg.style.maxWidth = "90vw"; // Đảm bảo không bị phóng đại quá mức
+        modalImg.style.maxHeight = "90vh";
+    }
+
+    function closeImageModal() {
+        document.getElementById("imageModal").style.display = "none";
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script th:src="@{/js/scripts.js}"></script>
+
+</body>
+
+</html>
